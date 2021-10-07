@@ -1,0 +1,31 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+javafx {
+    version = "16"
+    modules = ['javafx.controls']
+}
+
+mainClassName = 'ca.qc.bdeb.inf203.demineurtp1.MainJavaFX'
+
+task(runCmd, dependsOn: 'classes', type: JavaExec) {
+    mainClass.set('ca.qc.bdeb.inf203.demineurtp1.MainCMD')
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+configure(runCmd) {
+    group = 'application'
+    description = 'Lancer en ligne de commande'
+}
