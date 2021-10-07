@@ -9,7 +9,7 @@ public class MainCMD {
         int rangée;
         int colonne;
         char action;
-        Demineur demineur = new Demineur();
+        Demineur demineur = new Demineur(10, 10, 10);
         char[][] grilleDemineurAffichage = new char[demineur.getHauteurDeGrille()][demineur.getLargeurDeGrille()];
 
         demineur.genererGrille();

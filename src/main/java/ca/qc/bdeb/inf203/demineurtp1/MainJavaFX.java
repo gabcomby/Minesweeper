@@ -23,6 +23,7 @@ public class MainJavaFX extends Application {
         launch(args);
     }
 
+    Demineur demineur;
     @Override
     public void start(Stage stage) throws Exception {
         BorderPane root = new BorderPane();
@@ -59,5 +60,36 @@ public class MainJavaFX extends Application {
         stage.setTitle("Démineur");
         stage.setScene(scene);
         stage.show();
+
+        recommencer.setOnAction((event) -> {
+            recommencerPartie();
+        });
+
+        nouvellePartie.setOnAction((event) -> {
+            nouvellePartie(choixNbrBombes.getVisibleRowCount()); //EST-CE LA BONNE MÉTHODE?????
+        });
+
+        abandonner.setOnAction((event) -> {
+            abandonnerPartie();
+        });
+
+    }
+
+    public void recommencerPartie () {
+        demineur.recommencerPartieEnCours();
+    }
+
+    public void nouvellePartie (int nbrBombes) {
+        demineur = new Demineur(15, 15, nbrBombes);
+        demineur.genererGrille();
+        partieEnCours();
+    }
+
+    public void abandonnerPartie () {
+        demineur.setGameOver(true);
+    }
+
+    public void partieEnCours () {
+        //demineur.faireJouerLeJoueur();
     }
 }
