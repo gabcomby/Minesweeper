@@ -7,8 +7,8 @@ public class Demineur {
     private int largeurDeGrille;
     private int hauteurDeGrille;
     private int nbrDeBombes;
-    private char[][] grilleDemineurAffichage;
     private Tuiles[][] grilleDemineurLogique;
+    private Tuiles[][] grilleDemineurLogiqueCopie;
     private boolean gameOver;
 
 
@@ -18,7 +18,19 @@ public class Demineur {
         this.nbrDeBombes = 10;
         this.gameOver = false;
         this.grilleDemineurLogique = new Tuiles[hauteurDeGrille][largeurDeGrille];
-        this.grilleDemineurAffichage = new char[hauteurDeGrille][largeurDeGrille];
+        this.grilleDemineurLogiqueCopie = new Tuiles[hauteurDeGrille][largeurDeGrille];
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public Tuiles[][] getGrilleDemineurLogique() {
+        return grilleDemineurLogique;
     }
 
     public int getLargeurDeGrille() {
@@ -45,41 +57,9 @@ public class Demineur {
         this.nbrDeBombes = nbrDeBombes;
     }
 
-    public char[][] getGrilleDemineurAffichage() {
-        return grilleDemineurAffichage;
-    }
-
-    public void setGrilleDemineurAffichage(char[][] grilleDemineur) {
-        this.grilleDemineurAffichage = grilleDemineur;
-    }
-
     Scanner clavier = new Scanner(System.in);
     protected void demarrerPartie() {
         genererGrille();
-        genererGrilleAffichage();
-        afficherGrille();
-        partieEnCours();
-    }
-//DÉPLACER PARTIEENCOURS DANS MAINCMD SI POSSIBLE AFIN DE RESPECTER LE VUE-MODELE-CONTROLEUR
-    protected void partieEnCours() {
-        int rangée;
-        int colonne;
-        char action;
-        char[] prochaineActionSéparée;
-        while (gameOver == false) {
-            System.out.println("Pour ouvrir une case, rentrez 'o' suivi des coordonnées (ex : o 4 3)");
-            System.out.println("Pour placer un drapeau, rentrez 'd' suivi des coordonnées (ex : d 5 6)");
-            System.out.println("Entrez l'action à affectuer : ");
-            String prochaineAction = clavier.nextLine();
-            prochaineActionSéparée = prochaineAction.toCharArray();
-            action = prochaineActionSéparée[0];
-            rangée = prochaineActionSéparée[2] - 48;
-            colonne = prochaineActionSéparée[4] - 48;
-            faireJouerLeJoueur(rangée, colonne, action);
-            genererGrilleAffichage();
-            afficherGrille();
-        }
-        System.out.println("GAME OVER : La partie est perdue :(");
     }
 
     protected void genererGrille() {
@@ -97,25 +77,13 @@ public class Demineur {
                     dejaUneBombe = false;
             } while (dejaUneBombe == true);
             grilleDemineurLogique[hauteurBombe][largeurBombe] = new Bombes();
+            grilleDemineurLogiqueCopie[hauteurBombe][largeurBombe] = new Bombes();
         }
         for (int i = 0; i < hauteurDeGrille; i++) {
             for (int j = 0; j < largeurDeGrille; j++) {
-                if (grilleDemineurLogique[i][j] == null)
+                if (grilleDemineurLogique[i][j] == null) {
                     grilleDemineurLogique[i][j] = new CaseVide();
-            }
-        }
-    }
-
-    protected void genererGrilleAffichage() {
-        for (int i = 0; i < hauteurDeGrille; i++) {
-            for (int j = 0; j < largeurDeGrille; j++) {
-                if (grilleDemineurLogique[i][j] instanceof Bombes) {
-                    if (gameOver == true)
-                        grilleDemineurAffichage[i][j] = 'x';
-                    else
-                        grilleDemineurAffichage[i][j] = grilleDemineurLogique[i][j].getAffichage();
-                } else {
-                    grilleDemineurAffichage[i][j] = grilleDemineurLogique[i][j].getAffichage();
+                    grilleDemineurLogiqueCopie[i][j] = new CaseVide();
                 }
             }
         }
@@ -142,8 +110,9 @@ public class Demineur {
                 case 'd': {
                     if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == false)
                         grilleDemineurLogique[rangée][colonne] = new Drapeau();
-                    else if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == true)
-                        grilleDemineurLogique[rangée][colonne] = new CaseVide();
+                    else if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == true) {
+                        grilleDemineurLogique[rangée][colonne] = grilleDemineurLogiqueCopie [rangée][colonne];
+                    }
                 }break;
             }
         }
@@ -157,7 +126,7 @@ public class Demineur {
             compteurBombeAdjacente++;
         if (colonne - 1 >= 0 && grilleDemineurLogique[rangée][colonne - 1] instanceof Bombes)
             compteurBombeAdjacente++;
-        if (rangée + 1 <= 9 && grilleDemineurLogique[rangée][colonne + 1] instanceof Bombes)
+        if (colonne + 1 <= 9 && grilleDemineurLogique[rangée][colonne + 1] instanceof Bombes)
             compteurBombeAdjacente++;
         if (rangée - 1 >= 0 && colonne - 1 >= 0 && grilleDemineurLogique[rangée - 1][colonne - 1] instanceof Bombes)
             compteurBombeAdjacente++;
@@ -168,15 +137,6 @@ public class Demineur {
         if (rangée + 1 <= 9 && colonne + 1 <= 9 && grilleDemineurLogique[rangée + 1][colonne + 1] instanceof Bombes)
             compteurBombeAdjacente++;
         return compteurBombeAdjacente;
-    }
-
-    protected void afficherGrille() {
-        for(int i = 0; i<largeurDeGrille; i++) {
-            for(int j = 0; j< hauteurDeGrille; j++) {
-                System.out.print(grilleDemineurAffichage[i][j]);
-            }
-            System.out.println();
-        }
     }
 
     protected void ouvrirCasesVidesAdjacentes (int rangée, int colonne) {
