@@ -25,10 +25,6 @@ public class Demineur {
         return gameOver;
     }
 
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-    }
-
     public Tuiles[][] getGrilleDemineurLogique() {
         return grilleDemineurLogique;
     }
@@ -37,29 +33,8 @@ public class Demineur {
         return largeurDeGrille;
     }
 
-    public void setLargeurDeGrille(int largeurDeGrille) {
-        this.largeurDeGrille = largeurDeGrille;
-    }
-
     public int getHauteurDeGrille() {
         return hauteurDeGrille;
-    }
-
-    public void setHauteurDeGrille(int hauteurDeGrille) {
-        this.hauteurDeGrille = hauteurDeGrille;
-    }
-
-    public int getNbrDeBombes() {
-        return nbrDeBombes;
-    }
-
-    public void setNbrDeBombes(int nbrDeBombes) {
-        this.nbrDeBombes = nbrDeBombes;
-    }
-
-    Scanner clavier = new Scanner(System.in);
-    protected void demarrerPartie() {
-        genererGrille();
     }
 
     protected void genererGrille() {
@@ -106,14 +81,16 @@ public class Demineur {
                             }
                         }
                     }
-                }break;
+                }
+                break;
                 case 'd': {
                     if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == false)
                         grilleDemineurLogique[rangée][colonne] = new Drapeau();
                     else if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == true) {
-                        grilleDemineurLogique[rangée][colonne] = grilleDemineurLogiqueCopie [rangée][colonne];
+                        grilleDemineurLogique[rangée][colonne] = grilleDemineurLogiqueCopie[rangée][colonne];
                     }
-                }break;
+                }
+                break;
             }
         }
     }
@@ -139,7 +116,7 @@ public class Demineur {
         return compteurBombeAdjacente;
     }
 
-    protected void ouvrirCasesVidesAdjacentes (int rangée, int colonne) {
+    protected void ouvrirCasesVidesAdjacentes(int rangée, int colonne) {
         final int rangéeConstante = rangée;
         final int colonneConstante = colonne;
         int nbrBombesAdjacentes;
@@ -147,49 +124,57 @@ public class Demineur {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante - 1, colonneConstante);
             grilleDemineurLogique[rangée - 1][colonne].setEstOuvert(true);
             grilleDemineurLogique[rangée - 1][colonne].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante);
+        }
         if (rangée + 1 <= 9 && grilleDemineurLogique[rangée + 1][colonne].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante + 1, colonneConstante);
             grilleDemineurLogique[rangée + 1][colonne].setEstOuvert(true);
             grilleDemineurLogique[rangée + 1][colonne].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante);
+        }
         if (colonne - 1 >= 0 && grilleDemineurLogique[rangée][colonne - 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante, colonneConstante - 1);
             grilleDemineurLogique[rangée][colonne - 1].setEstOuvert(true);
             grilleDemineurLogique[rangée][colonne - 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante, colonneConstante - 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante, colonneConstante - 1);
+        }
         if (colonne + 1 <= 9 && grilleDemineurLogique[rangée][colonne + 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante, colonneConstante + 1);
             grilleDemineurLogique[rangée][colonne + 1].setEstOuvert(true);
             grilleDemineurLogique[rangée][colonne + 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante, colonneConstante + 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante, colonneConstante + 1);
+        }
         if (rangée - 1 >= 0 && colonne - 1 >= 0 && grilleDemineurLogique[rangée - 1][colonne - 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante - 1, colonneConstante - 1);
             grilleDemineurLogique[rangée - 1][colonne - 1].setEstOuvert(true);
             grilleDemineurLogique[rangée - 1][colonne - 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante - 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante - 1);
+        }
         if (rangée - 1 >= 0 && colonne + 1 <= 9 && grilleDemineurLogique[rangée - 1][colonne + 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante - 1, colonneConstante + 1);
             grilleDemineurLogique[rangée - 1][colonne + 1].setEstOuvert(true);
             grilleDemineurLogique[rangée - 1][colonne + 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante + 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante - 1, colonneConstante + 1);
+        }
         if (rangée + 1 <= 9 && colonne - 1 >= 0 && grilleDemineurLogique[rangée + 1][colonne - 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante + 1, colonneConstante - 1);
             grilleDemineurLogique[rangée + 1][colonne - 1].setEstOuvert(true);
             grilleDemineurLogique[rangée + 1][colonne - 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante - 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante - 1);
+        }
         if (rangée + 1 <= 9 && colonne + 1 <= 9 && grilleDemineurLogique[rangée + 1][colonne + 1].isEstOuvert() == false) {
             nbrBombesAdjacentes = compterBombesAdjacentes(rangéeConstante + 1, colonneConstante + 1);
             grilleDemineurLogique[rangée + 1][colonne + 1].setEstOuvert(true);
             grilleDemineurLogique[rangée + 1][colonne + 1].setAffichage((char) (nbrBombesAdjacentes + 48));
-            if(nbrBombesAdjacentes == 0)
-                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante + 1);}
+            if (nbrBombesAdjacentes == 0)
+                ouvrirCasesVidesAdjacentes(rangéeConstante + 1, colonneConstante + 1);
+        }
     }
 }

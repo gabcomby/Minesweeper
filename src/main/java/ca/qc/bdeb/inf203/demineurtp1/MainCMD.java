@@ -4,8 +4,6 @@ import java.util.Scanner;
 
 public class MainCMD {
     public static void main(String[] args) {
-        //TODO :
-        // MainCMD doit contenier tous les SOUT, la boucle principale et l'affichage gameOver
         Scanner clavier = new Scanner(System.in);
         char[]prochaineActionSéparée;
         int rangée;
@@ -14,7 +12,7 @@ public class MainCMD {
         Demineur demineur = new Demineur();
         char[][] grilleDemineurAffichage = new char[demineur.getHauteurDeGrille()][demineur.getLargeurDeGrille()];
 
-        demineur.demarrerPartie();
+        demineur.genererGrille();
         grilleDemineurAffichage = genererGrilleAffichage(demineur, grilleDemineurAffichage);
         afficherGrille(grilleDemineurAffichage, demineur);
         while(demineur.isGameOver() == false) {
@@ -30,6 +28,7 @@ public class MainCMD {
             grilleDemineurAffichage = genererGrilleAffichage(demineur, grilleDemineurAffichage);
             afficherGrille(grilleDemineurAffichage, demineur);
         }
+        System.out.println("Oh non, vous avez explosé sur une bombe!");
     }
 
     static public void afficherGrille(char[][] grilleDemineurAffichage, Demineur demineur) {
