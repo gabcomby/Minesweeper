@@ -16,7 +16,8 @@ import javafx.stage.Stage;
 //Bouton recommencer : reset la grille logique en copiant "grilleLogiqueCopie" dessus
 //Bouton abandonner : set gameOver = true et afficher toutes les bombes
 //Bouton nouvellePartie : passer en paramètre la taille de la grille (15x15) et le nbr de bombe
-//Afficher la grille
+//Ajouter une fonction pour créer le GridPane de IMGVIEW comme dans le projet de ce matin
+//Ajouter une fonction rafraichirGrille
 
 public class MainJavaFX extends Application {
     public static void main(String[] args) {
