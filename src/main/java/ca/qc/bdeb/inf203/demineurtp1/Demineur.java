@@ -75,6 +75,7 @@ public class Demineur {
                     if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == false) {
                         if (grilleDemineurLogique[rangée][colonne] instanceof Bombes) {
                             gameOver = true;
+                            abandonnerPartieEnCours();
                         } else if (grilleDemineurLogique[rangée][colonne] instanceof CaseVide) {
                             int nbrBombesAdjacentes = compterBombesAdjacentes(rangée, colonne);
                             if (nbrBombesAdjacentes == 0) {
