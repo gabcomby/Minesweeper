@@ -21,27 +21,27 @@ public class MainJavaFX extends Application {
         launch(args);
     }
 
-    Demineur demineur;
-    ImageView[][] tabImageView;
-    final int hauteurGrille = 15;
-    final int largeurGrille = 15;
-    Image caseVide = new Image("ferme.png");
-    Image drapeau = new Image("drapeau.png");
-    Image bombe = new Image("bombe.png");
-    Image bombeExplosion = new Image("boom.png");
-    Image case0 = new Image("0.png");
-    Image case1 = new Image("1.png");
-    Image case2 = new Image("2.png");
-    Image case3 = new Image("3.png");
-    Image case4 = new Image("4.png");
-    Image case5 = new Image("5.png");
-    Image case6 = new Image("6.png");
-    Image case7 = new Image("7.png");
-    Image case8 = new Image("8.png");
-    GridPane gridPane = new GridPane();
-    int nbrDrapeauxSurLaGrille = 0;
-    Text nbrDrapeaux = new Text();
-    int nbrBombesSurLaGrille;
+    private Demineur demineur;
+    private ImageView[][] tabImageView;
+    private final int hauteurGrille = 15;
+    private final int largeurGrille = 15;
+    private Image caseVide = new Image("ferme.png");
+    private Image drapeau = new Image("drapeau.png");
+    private Image bombe = new Image("bombe.png");
+    private Image bombeExplosion = new Image("boom.png");
+    private Image case0 = new Image("0.png");
+    private Image case1 = new Image("1.png");
+    private Image case2 = new Image("2.png");
+    private Image case3 = new Image("3.png");
+    private Image case4 = new Image("4.png");
+    private Image case5 = new Image("5.png");
+    private Image case6 = new Image("6.png");
+    private Image case7 = new Image("7.png");
+    private Image case8 = new Image("8.png");
+    private GridPane gridPane = new GridPane();
+    private int nbrDrapeauxSurLaGrille = 0;
+    private Text nbrDrapeaux = new Text();
+    private int nbrBombesSurLaGrille;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -78,6 +78,7 @@ public class MainJavaFX extends Application {
         choixNbrBombes.getItems().add(30);
         choixNbrBombes.getItems().add(200);
         root.setBottom(nbrDrapeaux);
+        nbrDrapeaux.setFont(Font.font(15));
 
         stage.setTitle("Démineur");
         stage.setScene(scene);
@@ -101,6 +102,7 @@ public class MainJavaFX extends Application {
     public void recommencerPartie() {
         demineur.recommencerPartieEnCours();
         genererImgView();
+        nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
     }
 
     public void nouvellePartie(int nbrBombes) {
@@ -113,6 +115,8 @@ public class MainJavaFX extends Application {
 
     public void abandonnerPartie() {
         demineur.setGameOver(true);
+        demineur.abandonnerPartieEnCours();
+        nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
     }
 
     private void genererImgView() {

@@ -191,4 +191,13 @@ public class Demineur {
         }
         gameOver = false;
     }
+
+    protected void  abandonnerPartieEnCours () {
+        for(int i = 0; i<hauteurDeGrille; i++) {
+            for(int j = 0; j<largeurDeGrille; j++) {
+                if(grilleDemineurLogiqueCopie[i][j] instanceof Bombes)
+                    grilleDemineurLogique[i][j] = grilleDemineurLogiqueCopie[i][j];
+            }
+        }
+    }
 }
