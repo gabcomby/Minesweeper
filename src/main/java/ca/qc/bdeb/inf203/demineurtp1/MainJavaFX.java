@@ -16,20 +16,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-//TODO :
-//Bouton recommencer : reset la grille logique en copiant "grilleLogiqueCopie" dessus
-//Bouton abandonner : set gameOver = true et afficher toutes les bombes
-//Bouton nouvellePartie : passer en paramètre la taille de la grille (15x15) et le nbr de bombe
-//Ajouter une fonction pour créer le GridPane de IMGVIEW comme dans le projet de ce matin
-    //Dans les events buttonClicked des imgView, mettre la fct faireJouerJoueur et rafraichir la case
-
 public class MainJavaFX extends Application {
     public static void main(String[] args) {
         launch(args);
     }
 
     Demineur demineur;
-    ImageView [][] tabImageView;
+    ImageView[][] tabImageView;
     final int hauteurGrille = 15;
     final int largeurGrille = 15;
     Image caseVide = new Image("ferme.png");
@@ -46,6 +39,10 @@ public class MainJavaFX extends Application {
     Image case7 = new Image("7.png");
     Image case8 = new Image("8.png");
     GridPane gridPane = new GridPane();
+    int nbrDrapeauxSurLaGrille = 0;
+    Text nbrDrapeaux = new Text();
+    int nbrBombesSurLaGrille;
+
     @Override
     public void start(Stage stage) throws Exception {
         BorderPane root = new BorderPane();
@@ -63,6 +60,7 @@ public class MainJavaFX extends Application {
         root.setTop(grandeVbox);
         grandeVbox.getChildren().addAll(titre, menus, menuBombes);
         root.setCenter(gridPane);
+        gridPane.setAlignment(Pos.CENTER);
 
         Text titreJeu = new Text("Démineur");
         titreJeu.setFont(Font.font(15));
@@ -79,6 +77,7 @@ public class MainJavaFX extends Application {
         choixNbrBombes.getItems().add(15);
         choixNbrBombes.getItems().add(30);
         choixNbrBombes.getItems().add(200);
+        root.setBottom(nbrDrapeaux);
 
         stage.setTitle("Démineur");
         stage.setScene(scene);
@@ -89,55 +88,55 @@ public class MainJavaFX extends Application {
         });
 
         nouvellePartie.setOnAction((event) -> {
-            nouvellePartie(choixNbrBombes.getVisibleRowCount()); //EST-CE LA BONNE MÉTHODE?????
+            nouvellePartie((int) choixNbrBombes.getValue());
         });
 
         abandonner.setOnAction((event) -> {
             abandonnerPartie();
+            rafraichirGrilleVisuelle();
         });
 
     }
 
-    public void recommencerPartie () {
+    public void recommencerPartie() {
         demineur.recommencerPartieEnCours();
+        genererImgView();
     }
 
-    public void nouvellePartie (int nbrBombes) {
+    public void nouvellePartie(int nbrBombes) {
+        nbrBombesSurLaGrille = nbrBombes;
         demineur = new Demineur(largeurGrille, hauteurGrille, nbrBombes);
         tabImageView = new ImageView[largeurGrille][hauteurGrille];
         demineur.genererGrille();
         genererImgView();
-        partieEnCours();
     }
 
-    public void abandonnerPartie () {
+    public void abandonnerPartie() {
         demineur.setGameOver(true);
     }
 
-    public void partieEnCours () {
-        //demineur.faireJouerLeJoueur();
-    }
-
-    private void genererImgView () {
-        for(int i = 0; i<hauteurGrille; i++) {
-            for(int j = 0; j<largeurGrille; j++) {
+    private void genererImgView() {
+        for (int i = 0; i < hauteurGrille; i++) {
+            for (int j = 0; j < largeurGrille; j++) {
                 ImageView imgView = new ImageView();
                 imgView.setImage(caseVide);
 
-                int coordonneeColonne =j;
+                int coordonneeColonne = j;
                 int coordonneRangee = i;
 
                 tabImageView[i][j] = imgView;
                 gridPane.add(imgView, i, j);
 
+                nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
+
                 imgView.setOnMouseClicked((event) -> {
-                    if(event.getButton() == MouseButton.PRIMARY) {
-                        //Action d'ouvrir une case
+                    if (event.getButton() == MouseButton.PRIMARY) {
                         demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'o');
-                    }
-                    else if (event.getButton() == MouseButton.SECONDARY) {
-                        //Action de placer un drapeau
+                        rafraichirGrilleVisuelle();
+                    } else if (event.getButton() == MouseButton.SECONDARY) {
                         demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'd');
+                        rafraichirGrilleVisuelle();
+                        nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
                     }
                 });
             }
@@ -145,22 +144,54 @@ public class MainJavaFX extends Application {
     }
 
     private void rafraichirGrilleVisuelle() {
-
-        if(demineur.isGameOver() == true) {
-            for(int i = 0; i<largeurGrille; i++) {
-                for(int j = 0; j<hauteurGrille; j++) {
-                    if(demineur.getGrilleDemineurLogique()[i][j] instanceof Bombes)
+        nbrDrapeauxSurLaGrille = 0;
+        if (demineur.isGameOver() == true) {
+            for (int i = 0; i < largeurGrille; i++) {
+                for (int j = 0; j < hauteurGrille; j++) {
+                    if (demineur.getGrilleDemineurLogique()[i][j] instanceof Bombes)
                         tabImageView[i][j].setImage(bombe);
                 }
             }
-        }
-        else {
-            for(int i = 0; i<largeurGrille; i++) {
-                for(int j = 0; j<hauteurGrille; j++) {
-                    if((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == false)
-                        tabImageView[i][j].setImage(caseVide);
-                    else if((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == true) {
-                        //Insérer un code qui vérifie quelle image mettre dans la case selon le texte dedans
+        } else {
+            for (int i = 0; i < largeurGrille; i++) {
+                for (int j = 0; j < hauteurGrille; j++) {
+                    if ((demineur.getGrilleDemineurLogique()[i][j]) instanceof Drapeau == true) {
+                        tabImageView[i][j].setImage(drapeau);
+                        nbrDrapeauxSurLaGrille++;
+                    } else if ((demineur.getGrilleDemineurLogique()[i][j]) instanceof Drapeau == false) {
+                        if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == false) {
+                            tabImageView[i][j].setImage(caseVide);
+                        } else if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == true) {
+                            switch ((demineur.getGrilleDemineurLogique()[i][j]).getAffichage()) {
+                                case '0':
+                                    tabImageView[i][j].setImage(case0);
+                                    break;
+                                case '1':
+                                    tabImageView[i][j].setImage(case1);
+                                    break;
+                                case '2':
+                                    tabImageView[i][j].setImage(case2);
+                                    break;
+                                case '3':
+                                    tabImageView[i][j].setImage(case3);
+                                    break;
+                                case '4':
+                                    tabImageView[i][j].setImage(case4);
+                                    break;
+                                case '5':
+                                    tabImageView[i][j].setImage(case5);
+                                    break;
+                                case '6':
+                                    tabImageView[i][j].setImage(case6);
+                                    break;
+                                case '7':
+                                    tabImageView[i][j].setImage(case7);
+                                    break;
+                                case '8':
+                                    tabImageView[i][j].setImage(case8);
+                                    break;
+                            }
+                        }
                     }
                 }
             }
@@ -168,20 +199,3 @@ public class MainJavaFX extends Application {
 
     }
 }
-
-                /*if((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == false)
-                        imgView.setImage(caseVide);
-                        else if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == true) {
-                        switch ((demineur.getGrilleDemineurLogique()[i][j]).getAffichage()) {
-                        case '0' : imgView.setImage(case0);break;
-                        case '1' : imgView.setImage(case1);break;
-                        case '2' : imgView.setImage(case2);break;
-                        case '3' : imgView.setImage(case3);break;
-                        case '4' : imgView.setImage(case4);break;
-                        case '5' : imgView.setImage(case5);break;
-                        case '6' : imgView.setImage(case6);break;
-                        case '7' : imgView.setImage(case7);break;
-                        case '8' : imgView.setImage(case8);break;
-                        case 'd' : imgView.setImage(drapeau);break;
-                        }
-                        }*/

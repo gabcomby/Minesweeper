@@ -92,6 +92,7 @@ public class Demineur {
                         grilleDemineurLogique[rangée][colonne] = new Drapeau();
                     else if (grilleDemineurLogique[rangée][colonne] instanceof Drapeau == true) {
                         grilleDemineurLogique[rangée][colonne] = grilleDemineurLogiqueCopie[rangée][colonne];
+                        grilleDemineurLogique[rangée][colonne].setEstOuvert(false);
                     }
                 }
                 break;
@@ -183,6 +184,11 @@ public class Demineur {
     }
 
     protected void recommencerPartieEnCours () {
-        grilleDemineurLogique = grilleDemineurLogiqueCopie;
+        for(int i = 0; i<hauteurDeGrille; i++) {
+            for(int j = 0; j<largeurDeGrille; j++) {
+                grilleDemineurLogique[i][j] = grilleDemineurLogiqueCopie[i][j];
+            }
+        }
+        gameOver = false;
     }
 }
