@@ -21,10 +21,13 @@ public class MainJavaFX extends Application {
         launch(args);
     }
 
+    //On référence l'objet démineur ici afin de pouvoir y accéder facilement dans toute la classe (mais on ne l'instancie
+    //que dans la fonction NouvellePartie
     private Demineur demineur;
     private ImageView[][] tabImageView;
     private final int hauteurGrille = 15;
     private final int largeurGrille = 15;
+    //On ouvre toutes les images ici afin de pouvoir les référencer facilement dans la classe
     private Image caseVide = new Image("ferme.png");
     private Image drapeau = new Image("drapeau.png");
     private Image bombe = new Image("bombe.png");
@@ -41,42 +44,51 @@ public class MainJavaFX extends Application {
     private GridPane gridPane = new GridPane();
     private int nbrDrapeauxSurLaGrille = 0;
     private Text nbrDrapeaux = new Text();
+    //Différents compteurs afin de faciliter l'affichage de diverses éléments graphiques
     private int nbrBombesSurLaGrille;
+    private int coordonneeColonneBombeExplosee;
+    private int coordonneeRangeeBombeExplosee;
+    private boolean partieAbandonnee;
 
     @Override
     public void start(Stage stage) throws Exception {
+        //On crée ici un BorderPane qui va contenier plusieurs objets (une VBOX, deux HBOX et un GridPane)
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 900, 600);
         VBox grandeVbox = new VBox();
-        grandeVbox.setSpacing(10);
+        grandeVbox.setSpacing(10); //Cette VBOX va contenier plusieurs HBOX
         grandeVbox.setAlignment(Pos.CENTER);
-        HBox titre = new HBox();
+        HBox titre = new HBox(); //Cette HBOX contient le titre du jeu (DÉMINEUR)
         titre.setAlignment(Pos.CENTER);
-        HBox menus = new HBox();
+        HBox menus = new HBox(); //Cette HBOX contient les menus (Nouvelle Partie, Abandonner et Recommencer)
         menus.setAlignment(Pos.CENTER);
         menus.setSpacing(300);
-        HBox menuBombes = new HBox();
+        HBox menuBombes = new HBox(); //Cette HBOX contient le menu pour choisir le nbr de bombes d'une partie
         menuBombes.setSpacing(5);
         root.setTop(grandeVbox);
         grandeVbox.getChildren().addAll(titre, menus, menuBombes);
         root.setCenter(gridPane);
         gridPane.setAlignment(Pos.CENTER);
 
-        Text titreJeu = new Text("Démineur");
+        Text titreJeu = new Text("Démineur"); //Le titre du jeu
         titreJeu.setFont(Font.font(15));
         titre.getChildren().add(titreJeu);
+        //Les 3 boutons des menus
         Button nouvellePartie = new Button("Nouvelle partie");
         Button recommencer = new Button("Recommencer");
         Button abandonner = new Button("Abandonner");
         menus.getChildren().addAll(nouvellePartie, recommencer, abandonner);
         Text mines = new Text("Mines :");
+        //La ComboBox qui permet de choisir le nbr de bombes selon une sélection pré-déterminée
         ComboBox choixNbrBombes = new ComboBox();
         menuBombes.getChildren().addAll(mines, choixNbrBombes);
+        //Les différents choix de bombes
         choixNbrBombes.getItems().add(1);
         choixNbrBombes.getItems().add(5);
         choixNbrBombes.getItems().add(15);
         choixNbrBombes.getItems().add(30);
         choixNbrBombes.getItems().add(200);
+        //Le texte nbrDrapeaux affiche le nbr de bombes théoriquement restantes sur la grille selon le nbr de drapeaux
         root.setBottom(nbrDrapeaux);
         nbrDrapeaux.setFont(Font.font(15));
 
@@ -84,14 +96,18 @@ public class MainJavaFX extends Application {
         stage.setScene(scene);
         stage.show();
 
+        //Définis le comportement du bouton Recommencer
         recommencer.setOnAction((event) -> {
             recommencerPartie();
         });
 
+        //Définis le comportement du bouton NouvellePartie
         nouvellePartie.setOnAction((event) -> {
+            //On passe en paramètre le nbr de bombes choisi dans le ComboBox
             nouvellePartie((int) choixNbrBombes.getValue());
         });
 
+        //Définis le comportement du bouton Abandonner
         abandonner.setOnAction((event) -> {
             abandonnerPartie();
             rafraichirGrilleVisuelle();
@@ -99,13 +115,29 @@ public class MainJavaFX extends Application {
 
     }
 
+    /**
+     * La fonction recommencerPartie permet de recommencer l'exacte même grille. Pour cela, elle appelle la fonction
+     * recommencerPartieEnCours() du démineur, update les IMGVIEW du GridPane et reset l'indicateur du nombre de bombes
+     * restantes.
+     */
     public void recommencerPartie() {
+        //On set partieAbandonnee comme false afin de pouvoir afficher boom.png si le joueur clique sur une bombe
+        partieAbandonnee = false;
         demineur.recommencerPartieEnCours();
         genererImgView();
         nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
     }
 
+    /**
+     * La fonction nouvellePartie génère une nouvelle grille de démineur aléatoirement et génère un nouveau tableau
+     * de IMGVIEW.
+     *
+     * @param nbrBombes Passe en paramètre le nbr de bombes que l'on veut dans la nouvelle partie depuis la valeur
+     *                  sélectionnée dans le ComboBox
+     */
     public void nouvellePartie(int nbrBombes) {
+        //On set partieAbandonnee comme false afin de pouvoir afficher boom.png si le joueur clique sur une bombe
+        partieAbandonnee = false;
         nbrBombesSurLaGrille = nbrBombes;
         demineur = new Demineur(largeurGrille, hauteurGrille, nbrBombes);
         tabImageView = new ImageView[largeurGrille][hauteurGrille];
@@ -113,31 +145,52 @@ public class MainJavaFX extends Application {
         genererImgView();
     }
 
+    /**
+     * La fonction abandonnerPartie set le demineur en gameOver, ce qui va permettre d'afficher toutes les bombes d'un
+     * coup lorsque l'on va update les IMGVIEW.
+     */
     public void abandonnerPartie() {
+        //On set partieAbandonnee comme true pour éviter d'afficher boom.png alors que le joueur n'a cliqué sur aucune bombe
+        partieAbandonnee = true;
         demineur.setGameOver(true);
         demineur.abandonnerPartieEnCours();
         nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
     }
 
+    /**
+     * Cette fonction génère les 225 IMGVIEW qui composent la grille de démineur, et leur attribue à chacun un event
+     * lié au clic de la souris
+     */
     private void genererImgView() {
         for (int i = 0; i < hauteurGrille; i++) {
             for (int j = 0; j < largeurGrille; j++) {
+                //Crée un nouveai IMGVIEW et lui set l'image CaseVide par défaut
                 ImageView imgView = new ImageView();
                 imgView.setImage(caseVide);
 
+                //Garde de note les coordonnées de la case
                 int coordonneeColonne = j;
                 int coordonneRangee = i;
 
+                //Place le IMGVIEW dans un tableau, car c'est plus simple à manipuler qu'un GridPane
                 tabImageView[i][j] = imgView;
+                //Ajoute le IMGVIEW dans son conteneur (le GridPane)
                 gridPane.add(imgView, i, j);
 
+                //Set le texte du compteur de bombe
                 nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
 
+                //Déclencheur d'un évènement sur un clic de souris
                 imgView.setOnMouseClicked((event) -> {
+                    //Si c'est un clic gauche, on ouvre la case
                     if (event.getButton() == MouseButton.PRIMARY) {
                         demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'o');
+                        coordonneeColonneBombeExplosee = coordonneeColonne;
+                        coordonneeRangeeBombeExplosee = coordonneRangee;
                         rafraichirGrilleVisuelle();
-                    } else if (event.getButton() == MouseButton.SECONDARY) {
+                    }
+                    //Si c'est un clic droit on place un drapeau et on update le compteur de bombe
+                    else if (event.getButton() == MouseButton.SECONDARY) {
                         demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'd');
                         rafraichirGrilleVisuelle();
                         nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
@@ -147,8 +200,12 @@ public class MainJavaFX extends Application {
         }
     }
 
+    /**
+     * Cette fonction permet d'update l'entièreté de la grille visuelle (le tableau de IMGVIEW) d'un coup.
+     */
     private void rafraichirGrilleVisuelle() {
         nbrDrapeauxSurLaGrille = 0;
+        //Si le démineur est gameOver, la fonction va afficher toutes les bombes d'un coup
         if (demineur.isGameOver() == true) {
             for (int i = 0; i < largeurGrille; i++) {
                 for (int j = 0; j < hauteurGrille; j++) {
@@ -156,16 +213,25 @@ public class MainJavaFX extends Application {
                         tabImageView[i][j].setImage(bombe);
                 }
             }
+            //Si le joueur a vraiment perdu (et pas juste abandonné), on affiche la bombe qui l'a fait perdre avec
+            //boom.png plutôt que bombe.png
+            if (partieAbandonnee == false)
+                tabImageView[coordonneeRangeeBombeExplosee][coordonneeColonneBombeExplosee].setImage(bombeExplosion);
         } else {
             for (int i = 0; i < largeurGrille; i++) {
                 for (int j = 0; j < hauteurGrille; j++) {
+                    //Si la case du démineur contient un drapeau, alors l'image est changée pour celle d'un drapeau
                     if ((demineur.getGrilleDemineurLogique()[i][j]) instanceof Drapeau == true) {
                         tabImageView[i][j].setImage(drapeau);
                         nbrDrapeauxSurLaGrille++;
                     } else if ((demineur.getGrilleDemineurLogique()[i][j]) instanceof Drapeau == false) {
+                        //Si la case n'a pas été ouverte, l'image est changée pour celle d'une case vide
                         if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == false) {
                             tabImageView[i][j].setImage(caseVide);
-                        } else if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == true) {
+                        }
+                        //Si la case est ouverte, on se fie à l'affichage de l'objet CaseVide pour déterminer l'image
+                        //à afficher
+                        else if ((demineur.getGrilleDemineurLogique()[i][j]).isEstOuvert() == true) {
                             switch ((demineur.getGrilleDemineurLogique()[i][j]).getAffichage()) {
                                 case '0':
                                     tabImageView[i][j].setImage(case0);
