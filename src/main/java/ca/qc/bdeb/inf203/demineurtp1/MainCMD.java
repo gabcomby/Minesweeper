@@ -22,6 +22,8 @@ public class MainCMD {
         afficherGrille(grilleDemineurAffichage, demineur);
         //Boucle de jeu du démineur
         while (demineur.isGameOver() == false) {
+            //On place un try catch pour éviter les erreurs de tableau
+            try {
             System.out.println("Pour ouvrir une case, rentrez 'o' suivi des coordonnées (ex : o 4 3)");
             System.out.println("Pour placer un drapeau, rentrez 'd' suivi des coordonnées (ex : d 5 6)");
             System.out.println("Entrez l'action à affectuer : ");
@@ -34,6 +36,12 @@ public class MainCMD {
             demineur.faireJouerLeJoueur(rangée, colonne, action);
             grilleDemineurAffichage = genererGrilleAffichage(demineur, grilleDemineurAffichage);
             afficherGrille(grilleDemineurAffichage, demineur);
+            }
+            //On catch ArrayOutOfBond au cas ou l'utilisateur entre incorrectement sa consigne
+            catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Oups, il semblerait que vous ayez rentré une instruction non-valide!");
+                afficherGrille(grilleDemineurAffichage, demineur);
+            }
         }
         //Affiche un texte de défaite si le joueur explose
         System.out.println("Oh non, vous avez explosé sur une bombe!");

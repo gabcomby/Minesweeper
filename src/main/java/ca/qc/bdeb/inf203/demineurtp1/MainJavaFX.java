@@ -49,6 +49,8 @@ public class MainJavaFX extends Application {
     private int coordonneeColonneBombeExplosee;
     private int coordonneeRangeeBombeExplosee;
     private boolean partieAbandonnee;
+    //Compte le nbr de coups effectués dans la partie
+    private int nbrDeCoups;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -123,6 +125,8 @@ public class MainJavaFX extends Application {
     public void recommencerPartie() {
         //On set partieAbandonnee comme false afin de pouvoir afficher boom.png si le joueur clique sur une bombe
         partieAbandonnee = false;
+        //Reset le nbr de coups à 0
+        nbrDeCoups = 0;
         demineur.recommencerPartieEnCours();
         genererImgView();
         nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
@@ -138,6 +142,8 @@ public class MainJavaFX extends Application {
     public void nouvellePartie(int nbrBombes) {
         //On set partieAbandonnee comme false afin de pouvoir afficher boom.png si le joueur clique sur une bombe
         partieAbandonnee = false;
+        //Reset le nbr de coups à 0
+        nbrDeCoups = 0;
         nbrBombesSurLaGrille = nbrBombes;
         demineur = new Demineur(largeurGrille, hauteurGrille, nbrBombes);
         tabImageView = new ImageView[largeurGrille][hauteurGrille];
@@ -152,6 +158,8 @@ public class MainJavaFX extends Application {
     public void abandonnerPartie() {
         //On set partieAbandonnee comme true pour éviter d'afficher boom.png alors que le joueur n'a cliqué sur aucune bombe
         partieAbandonnee = true;
+        //Set le nbr de coups à 100 afin de ne déclencher aucun effet spécial
+        nbrDeCoups = 100;
         demineur.setGameOver(true);
         demineur.abandonnerPartieEnCours();
         nbrDrapeaux.setText("Bombes : " + nbrBombesSurLaGrille);
@@ -182,18 +190,23 @@ public class MainJavaFX extends Application {
 
                 //Déclencheur d'un évènement sur un clic de souris
                 imgView.setOnMouseClicked((event) -> {
-                    //Si c'est un clic gauche, on ouvre la case
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'o');
-                        coordonneeColonneBombeExplosee = coordonneeColonne;
-                        coordonneeRangeeBombeExplosee = coordonneRangee;
-                        rafraichirGrilleVisuelle();
-                    }
-                    //Si c'est un clic droit on place un drapeau et on update le compteur de bombe
-                    else if (event.getButton() == MouseButton.SECONDARY) {
-                        demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'd');
-                        rafraichirGrilleVisuelle();
-                        nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
+                    //On s'assure que la partie n'est pas perdue
+                    if (demineur.isGameOver() == false) {
+                        //Si c'est un clic gauche, on ouvre la case
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            nbrDeCoups++;
+                            demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'o');
+                            coordonneeColonneBombeExplosee = coordonneeColonne;
+                            coordonneeRangeeBombeExplosee = coordonneRangee;
+                            rafraichirGrilleVisuelle();
+                        }
+                        //Si c'est un clic droit on place un drapeau et on update le compteur de bombe
+                        else if (event.getButton() == MouseButton.SECONDARY) {
+                            nbrDeCoups++;
+                            demineur.faireJouerLeJoueur(coordonneRangee, coordonneeColonne, 'd');
+                            rafraichirGrilleVisuelle();
+                            nbrDrapeaux.setText("Bombes : " + (nbrBombesSurLaGrille - nbrDrapeauxSurLaGrille));
+                        }
                     }
                 });
             }
@@ -217,6 +230,9 @@ public class MainJavaFX extends Application {
             //boom.png plutôt que bombe.png
             if (partieAbandonnee == false)
                 tabImageView[coordonneeRangeeBombeExplosee][coordonneeColonneBombeExplosee].setImage(bombeExplosion);
+            //Permet d'ouvrir une page YouTube selon le nbr de coups joués ;)
+            if(nbrDeCoups <= 5)
+                getHostServices().showDocument("https://youtu.be/4Js-XbNj6Tk?t=38");
         } else {
             for (int i = 0; i < largeurGrille; i++) {
                 for (int j = 0; j < hauteurGrille; j++) {
