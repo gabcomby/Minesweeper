@@ -12,4 +12,5 @@ This program uses the following Java libraries :
 # Required hardware
 This program doesn't have any special hardware requirements.
 
-# Licence
+# License
+This project is open sourced under the MIT license. Feel free to reuse this code and modify it however you see fit.
