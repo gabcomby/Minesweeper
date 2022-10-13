@@ -1,4 +1,4 @@
-package ca.qc.bdeb.inf203.demineurtp1;
+package demineurtp1;
 
 public abstract class Tuiles {
     public Tuiles(char affichage) {

@@ -17,10 +17,10 @@ javafx {
     modules = ['javafx.controls']
 }
 
-mainClassName = 'ca.qc.bdeb.inf203.demineurtp1.MainJavaFX'
+mainClassName = 'demineurtp1.MainJavaFX'
 
 task(runCmd, dependsOn: 'classes', type: JavaExec) {
-    mainClass.set('ca.qc.bdeb.inf203.demineurtp1.MainCMD')
+    mainClass.set('demineurtp1.MainCMD')
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }

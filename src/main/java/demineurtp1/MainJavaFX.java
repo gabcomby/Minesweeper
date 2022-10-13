@@ -1,4 +1,4 @@
-package ca.qc.bdeb.inf203.demineurtp1;
+package demineurtp1;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
